@@ -237,7 +237,7 @@ with st.sidebar:
 
     mode = st.radio(
         "Mode",
-        ["Single Analysis", "Trend Analysis", "Compare Companies"],
+        ["Single Analysis", "Trend Analysis", "Compare Companies", "Upload Filing"],
         label_visibility="collapsed"
     )
 
@@ -270,14 +270,26 @@ with st.sidebar:
         run_btn = st.button("Analyze Trend", use_container_width=True)
 
     elif mode == "Compare Companies":
+        # Show saved uploaded filings as options too
+        saved = st.session_state.get("saved_filings", {})
+        saved_options = [f"📄 {v['company']} (Q{v['quarter']} {v['year']})" for v in saved.values()]
+        all_options = list(TICKERS.keys()) + saved_options
+
         companies_selected = st.multiselect(
             "Select Companies (2–4)",
-            list(TICKERS.keys()),
-            default=["Apple", "Microsoft", "Google"]
+            all_options,
+            default=["Apple", "Microsoft", "Google"] if len(all_options) >= 3 else all_options[:2]
         )
         year = st.selectbox("Year", [2024, 2023, 2022], index=0)
         quarter = st.selectbox("Quarter", [1, 2, 3, 4], index=0)
         run_btn = st.button("Compare", use_container_width=True)
+
+    elif mode == "Upload Filing":
+        # Show saved count
+        saved = st.session_state.get("saved_filings", {})
+        if saved:
+            st.markdown(f'<div style="font-size:0.75rem;color:#00d4aa;margin-bottom:0.5rem">✓ {len(saved)} filing(s) saved</div>', unsafe_allow_html=True)
+        run_btn = False
 
     st.markdown("---")
     st.markdown(
@@ -300,5 +312,25 @@ elif mode == "Trend Analysis":
 
 elif mode == "Compare Companies":
     from pages.compare import render_compare
-    tickers_selected = {c: TICKERS[c] for c in companies_selected} if 'companies_selected' in dir() else {}
-    render_compare(tickers_selected, year, quarter, run_btn if 'run_btn' in dir() else False)
+    saved = st.session_state.get("saved_filings", {})
+
+    # Build tickers dict — mix of EDGAR companies and uploaded filings
+    tickers_selected = {}
+    uploaded_selected = {}
+
+    for c in (companies_selected if 'companies_selected' in dir() else []):
+        if c.startswith("📄 "):
+            # Find matching saved filing
+            for key, filing in saved.items():
+                label = f"📄 {filing['company']} (Q{filing['quarter']} {filing['year']})"
+                if label == c:
+                    uploaded_selected[key] = filing
+                    break
+        elif c in TICKERS:
+            tickers_selected[c] = TICKERS[c]
+
+    render_compare(tickers_selected, year, quarter, run_btn if 'run_btn' in dir() else False, uploaded_selected)
+
+elif mode == "Upload Filing":
+    from pages.upload import render_upload
+    render_upload()
