@@ -236,7 +236,7 @@ sentiq/
 
 ## Team
 
-Built for CS4680 (Prompt Engineering) — Aaron, Sheldin, Anupama — Cal Poly Pomona, Spring 2026
+Aaron, Sheldin, Anupama
 
 ---
 
