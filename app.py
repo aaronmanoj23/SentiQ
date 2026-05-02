@@ -225,7 +225,8 @@ div[data-testid="stMarkdownContainer"] p {
 .stPlotlyChart { border-radius: 10px; overflow: hidden; }
 
 /* Hide streamlit branding */
-#MainMenu, footer, header { visibility: hidden; }
+#MainMenu, footer { visibility: hidden; }
+header { visibility: visible; }
 </style>
 """, unsafe_allow_html=True)
 
