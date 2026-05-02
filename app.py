@@ -303,15 +303,15 @@ with st.sidebar:
 
 # ── Main content ─────────────────────────────────────────────────────────────
 if mode == "Single Analysis":
-    from pages.single import render_single
+    from views.single import render_single
     render_single(ticker, company, year, quarter, run_btn if 'run_btn' in dir() else False)
 
 elif mode == "Trend Analysis":
-    from pages.trend import render_trend
+    from views.trend import render_trend
     render_trend(ticker, company, year, run_btn if 'run_btn' in dir() else False)
 
 elif mode == "Compare Companies":
-    from pages.compare import render_compare
+    from views.compare import render_compare
     saved = st.session_state.get("saved_filings", {})
 
     # Build tickers dict — mix of EDGAR companies and uploaded filings
@@ -332,5 +332,5 @@ elif mode == "Compare Companies":
     render_compare(tickers_selected, year, quarter, run_btn if 'run_btn' in dir() else False, uploaded_selected)
 
 elif mode == "Upload Filing":
-    from pages.upload import render_upload
+    from views.upload import render_upload
     render_upload()
